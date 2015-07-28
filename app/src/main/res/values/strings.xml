@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">GeoGoals</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_goal_form">GoalForm</string>
+    <string name="title_activity_goal_location">Map</string>
+    <string name="new_goal_button">Add goal</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve">YOUR_KEY_HERE</string>
 </resources>
