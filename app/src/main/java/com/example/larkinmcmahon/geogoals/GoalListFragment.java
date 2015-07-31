@@ -1,13 +1,16 @@
 package com.example.larkinmcmahon.geogoals;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.google.android.gms.location.Geofence;
@@ -22,9 +25,11 @@ import java.util.List;
  */
 public class GoalListFragment extends Fragment {
     private Context mContext;
-    private List<Geofence> mGeofenceList;
-    private List<String> mGoals;
+    private List<Goal> mGoals;
+    private List<String> mGoalStrings;
     private ArrayAdapter<String> mGoalAdapter;
+    private Button mAddGoalButton;
+    private String TAG = "GOAL_LIST_FRAGMENT";
 
     public GoalListFragment() {
     }
@@ -35,41 +40,39 @@ public class GoalListFragment extends Fragment {
 
         mContext = getActivity();
 
+        mGoalStrings = new ArrayList<String>();
 
-        mGoals = new ArrayList<String>();
+        mGoals = ((GoalList) mContext).getGoals();
 
-        mGeofenceList = ((GoalList) mContext).getGeofences();
-
-        for(int i = 0; i < mGeofenceList.size(); i++){
-            Geofence goal = mGeofenceList.get(i);
-            mGoals.add(goal.getRequestId());
+        for(int i = 0; i < mGoals.size(); i++){
+            Goal goal = mGoals.get(i);
+            mGoalStrings.add(goal.getTitle());
         }
 
         mGoalAdapter = new ArrayAdapter<String>(
                 getActivity(),
                 R.layout.list_item_goal,
                 R.id.list_item_goal_textview,
-                mGoals
+                mGoalStrings
         );
 
-        Button addGoalButton = new Button(getActivity());
+        mAddGoalButton = new Button(getActivity());
 
-        addGoalButton.setText(R.string.new_goal_button);
-        addGoalButton.setOnClickListener(new View.OnClickListener() {
+        mAddGoalButton.setText(R.string.new_goal_button);
+        mAddGoalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((GoalList)mContext).addGoal();
+                ((GoalList) getActivity()).addGoalButtonClick();
             }
         });
 
+
         View rootView = inflater.inflate(R.layout.fragment_goal_list, container, false);
-
-
 
         ListView goal_list = (ListView) rootView.findViewById(R.id.fragment_goal_listview);
 
 
-        goal_list.addFooterView(addGoalButton);
+        goal_list.addFooterView(mAddGoalButton);
 
         goal_list.setAdapter(mGoalAdapter);
 
@@ -77,9 +80,11 @@ public class GoalListFragment extends Fragment {
 
     }
 
-    public void updateListView(List<Geofence> newGeofences){
-        for(int i = 0; i < newGeofences.size(); i++){
-            mGoals.add(newGeofences.get(i).getRequestId());
+
+    public void updateListView(List<Goal> newGoals){
+        Log.i(TAG, "updating List View");
+        for(int i = 0; i < newGoals.size(); i++){
+            mGoalStrings.add(newGoals.get(i).getTitle());
         }
         mGoalAdapter.notifyDataSetChanged();
     }

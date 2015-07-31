@@ -18,6 +18,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class GoalList extends AppCompatActivity implements
     private int mGeoFenceId;
     private GeofenceService mGeofenceService;
     private GoalListFragment mGoalList;
+    private ArrayList<Goal> mGoals;
 
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -78,7 +80,9 @@ public class GoalList extends AppCompatActivity implements
 
         mGeofencePendingIntent = null;
 
+        mGoals = new ArrayList<Goal>();
         mGeofenceList = new ArrayList<Geofence>();
+
 
         setContentView(R.layout.activity_goal_list);
 
@@ -103,10 +107,10 @@ public class GoalList extends AppCompatActivity implements
         return true;
     }
 
-    public void addGoal(){
+    public void addGoalButtonClick(){
         Intent intent = new Intent(this, GoalLocation.class);
         int requestCode = 1;
-        startActivityForResult(intent, requestCode);
+        this.startActivityForResult(intent, requestCode);
     }
 
     @Override
@@ -124,22 +128,23 @@ public class GoalList extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        double latitude = data.getDoubleExtra("latitude", -200.0);
-        double longitude = data.getDoubleExtra("longitude", -200.0);
-        int radius = data.getIntExtra("radius", -1);
-        if(latitude == -200.0 || longitude == -200.0 || radius == -1) {
-            Log.e(TAG, "invalid form data");
-            return;
+        if(resultCode == RESULT_OK) {
+            Goal goal = data.getParcelableExtra("goal");
+            Log.v(TAG, "Goal returned: " + goal.getTitle());
+            addGoal(goal);
+            mGoalList.updateListView(mGoals);
+            mGoals.clear();
+
+        } else {
+            Log.e(TAG, "Error in activity result");
         }
-        addGeofence(latitude, longitude, radius);
-        mGoalList.updateListView(mGeofenceList);
-        updateGeofences();
+
     }
 
-    public List<Geofence> getGeofences() {
-        return mGeofenceList;
+    public List<Goal> getGoals() {
+        return mGoals;
     }
 
     @Override
@@ -156,16 +161,32 @@ public class GoalList extends AppCompatActivity implements
         unbindService(mConnection);
     }
 
-    public void addGeofence(double lat, double lon, int radius){
-        mGeofenceList.add(new Geofence.Builder()
-                        .setRequestId(String.valueOf(mGeoFenceId++))
-                        .setCircularRegion(lat, lon, radius)
-                                //sets expiration date for 1 week
-                        .setExpirationDuration(1000 * 3600 * 24 * 7)
-                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER
-                                | Geofence.GEOFENCE_TRANSITION_EXIT)
-                        .build()
-        );
+    /*
+        Updates the private variable mGoals with the new goal, as well as adding all geofences associated
+        with the new goal to the list of geofences
+     */
+    public void addGoal(Goal goal){
+        mGoals.add(goal);
+
+        //creates geofences from location based information in the goal and adds it to the geofence list
+        List<LatLng> coords = goal.getLocations();
+        List<Integer> radii = goal.getRadii();
+        for(int i = 0; i < coords.size(); i++){
+            LatLng coord = coords.get(i);
+            mGeofenceList.add(new Geofence.Builder()
+                            .setRequestId(String.valueOf(mGeoFenceId++))
+                            .setCircularRegion(coord.latitude, coord.longitude, radii.get(i))
+                                    //sets expiration date for 1 week
+                            .setExpirationDuration(1000 * 3600 * 24 * 7)
+                            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER
+                                    | Geofence.GEOFENCE_TRANSITION_EXIT)
+                            .build()
+            );
+        }
+
+        //sends the geofence list to the listeners
+        updateGeofences();
+
     }
 
 
