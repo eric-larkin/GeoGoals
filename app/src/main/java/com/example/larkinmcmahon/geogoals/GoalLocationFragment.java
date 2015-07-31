@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -43,7 +44,7 @@ public class GoalLocationFragment extends Fragment {
     private GeofenceService mGeofenceService;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private String TAG = "GOAL_LOCATION_FRAGMENT";
-    private EditText mTitleText;
+    private AutoCompleteTextView mTitleText;
     private View mRootView;
 
     private ServiceConnection mConnection;
@@ -57,7 +58,7 @@ public class GoalLocationFragment extends Fragment {
 
         mRootView = inflater.inflate(R.layout.fragment_goal_location, container, false);
 
-        mTitleText = (EditText) mRootView.findViewById(R.id.title_box);
+        mTitleText = (AutoCompleteTextView) mRootView.findViewById(R.id.title_box);
         mTitleText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -68,6 +69,11 @@ public class GoalLocationFragment extends Fragment {
 
             }
         });
+
+        String[] titleSuggestions = getResources().getStringArray(R.array.goal_title_suggestions);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_list_item_1, titleSuggestions);
+        mTitleText.setAdapter(adapter);
+
         mTitleText.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
