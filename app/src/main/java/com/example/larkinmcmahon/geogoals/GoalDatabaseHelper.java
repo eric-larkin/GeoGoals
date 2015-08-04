@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -119,6 +120,8 @@ public class GoalDatabaseHelper extends SQLiteOpenHelper {
                                      cursor.getInt(3),
                                      cursor.getString(4)
                                      );
+                int idnum = goal.getOverallID();
+                Log.d("GOALDBHELPER",String.valueOf(idnum));
 //                goal.setTitle(cursor.getString(1));
 //                goal.setOccurance(cursor.getInt(2));
 //                goal.setTimeFrame(cursor.getInt(3));
@@ -157,7 +160,7 @@ public class GoalDatabaseHelper extends SQLiteOpenHelper {
     public void deleteGoal(Goal goal) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_Goals, KEY_ID + " = ?",
-                new String[] { String.valueOf(goal.getID()) });
+                new String[]{String.valueOf(goal.getID()) });
         db.close();
     }
 
