@@ -91,7 +91,7 @@ public class GoalList extends AppCompatActivity implements
 
             List<Integer> ints = new ArrayList<Integer>();
             ints.add(3);
-            Goal newGoal = new Goal("testing", latlns, ints, 0, 1, "comment","01-01-15","8:00","02-02-15","10:00");
+            Goal newGoal = new Goal("testing", latlns, ints, new ArrayList<Integer>(), 0, 1, "comment","01-01-15","8:00","02-02-15","10:00");
 
             ContentValues values = new ContentValues();
             values.put(GoalDatabaseHelper.KEY_ID,newGoal.getID());
@@ -125,6 +125,35 @@ public class GoalList extends AppCompatActivity implements
             for(int i = 0; i < locationInformation.size(); i++) {
                 getContentResolver().insert(GoalsProvider.LOCATION_URI,locationInformation.get(i));
             }
+
+            Goal newGoal2 = new Goal("testing2", latlns, ints,new ArrayList<Integer>(), 0, 1, "comment","01-01-15","8:00","02-02-15","10:00");
+
+            ContentValues values2 = new ContentValues();
+            values2.put(GoalDatabaseHelper.KEY_ID,newGoal2.getID());
+            values2.put(GoalDatabaseHelper.KEY_GOALNAME,newGoal2.getTitle());
+            values2.put(GoalDatabaseHelper.KEY_OCCURANCES,newGoal2.getOccurance());
+            values2.put(GoalDatabaseHelper.KEY_TIMEFRAME, newGoal2.getTimeFrame());
+            values2.put(GoalDatabaseHelper.KEY_COMMENTS,newGoal2.getComments());
+            values2.put(GoalDatabaseHelper.KEY_STARTDATE,newGoal2.getStartDate());
+            values2.put(GoalDatabaseHelper.KEY_ENDDATE,newGoal2.getEndDate());
+            values2.put(GoalDatabaseHelper.KEY_STARTTIME,newGoal2.getStartTime());
+            values2.put(GoalDatabaseHelper.KEY_ENDTIME,newGoal2.getEndTime());
+
+//            values.put(GoalDatabaseHelper.KEY_LAT),
+            Uri insertVal2 = getContentResolver().insert(GoalsProvider.CONTENT_URI,values2);
+
+            ArrayList<ContentValues> locationInformation1 = new ArrayList<ContentValues>();
+            ContentValues a1 = new ContentValues();
+            a1.put(GoalDatabaseHelper.KEY_COORID,newGoal.getID());
+            a1.put(GoalDatabaseHelper.KEY_LAT, 10);
+            a1.put(GoalDatabaseHelper.KEY_LONG, 20);
+            a1.put(GoalDatabaseHelper.KEY_RADII, 50);
+
+            locationInformation.add(a1);
+
+            for(int i = 0; i < locationInformation1.size(); i++) {
+                getContentResolver().insert(GoalsProvider.LOCATION_URI,locationInformation1.get(i));
+            }
         }
 
         mGeofenceList = new ArrayList<Geofence>();
@@ -136,6 +165,7 @@ public class GoalList extends AppCompatActivity implements
         if(getSupportFragmentManager().findFragmentById(R.id.fragment_goal_detail) != null) {
             mTabletView = true;
         }
+
     }
 
 
@@ -213,10 +243,11 @@ public class GoalList extends AppCompatActivity implements
         else {
             if (id == R.id.action_settings) {
                 return true;
-            } else if (id == R.id.action_add_goal) {
-                Intent intent = new Intent(this, GoalAdd.class);
-                startActivity(intent);
             }
+// else if (id == R.id.action_add_goal) {
+//                Intent intent = new Intent(this, GoalAdd.class);
+//                startActivity(intent);
+//            }
         }
 
         return super.onOptionsItemSelected(item);

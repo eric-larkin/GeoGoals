@@ -50,46 +50,50 @@ public class GoalEditFragment extends Fragment implements LoaderManager.LoaderCa
         View rootView = inflater.inflate(R.layout.fragment_goal_edit, container, false);
         mEditGoalTitleText = (TextView) rootView.findViewById(R.id.goal_title_editbox);
 
-        return rootView;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
         Intent intent = getActivity().getIntent();
-
-        if (intent != null && intent.hasExtra("dbid")) {
-            String projection[] = { GoalDatabaseHelper.KEY_GOALNAME,
-                                    GoalDatabaseHelper.KEY_COMMENTS,
-                                    GoalDatabaseHelper.KEY_OCCURANCES,
-                                    GoalDatabaseHelper.KEY_TIMEFRAME};
-            int dbid = intent.getIntExtra("dbID", 0);
-            Cursor cursor = getActivity().getContentResolver().query(
-                    Uri.withAppendedPath(GoalsProvider.CONTENT_URI,
-                            String.valueOf(dbid)),projection,null,null,null);
-            if(cursor.moveToFirst()) {
-                String mGoalName = cursor.getString(0);
-                String mComments = cursor.getString(1);
-                String mOccurances = cursor.getString(2);
-                String mTimeFrame = cursor.getString(3);
-
-                ((TextView) getActivity().findViewById(R.id.goal_title_editbox))
-                        .setText(mGoalName);
-                ((TextView) getActivity().findViewById(R.id.goal_comments_editbox))
-                        .setText(mComments);
-                ((TextView) getActivity().findViewById(R.id.goal_occurrences_editbox))
-                        .setText(String.valueOf(mOccurances));
-                ((TextView) getActivity().findViewById(R.id.goal_timeframe_editbox))
-                        .setText(String.valueOf(mTimeFrame));
-            }
+        if (intent.hasExtra("dbid")) {
+            mDbID = intent.getIntExtra("dbid", -1);
         }
+        return rootView;
     }
 
 //    @Override
 //    public void onActivityCreated(Bundle savedInstanceState) {
-//        getLoaderManager().initLoader(LOADER_ID, null, this);
 //        super.onActivityCreated(savedInstanceState);
+//        Intent intent = getActivity().getIntent();
+//
+//        if (intent != null && intent.hasExtra("dbid")) {
+//            String projection[] = { GoalDatabaseHelper.KEY_GOALNAME,
+//                                    GoalDatabaseHelper.KEY_COMMENTS,
+//                                    GoalDatabaseHelper.KEY_OCCURANCES,
+//                                    GoalDatabaseHelper.KEY_TIMEFRAME};
+//            int dbid = intent.getIntExtra("dbID", 0);
+//            Cursor cursor = getActivity().getContentResolver().query(
+//                    Uri.withAppendedPath(GoalsProvider.CONTENT_URI,
+//                            String.valueOf(dbid)),projection,null,null,null);
+//            if(cursor.moveToFirst()) {
+//                String mGoalName = cursor.getString(0);
+//                String mComments = cursor.getString(1);
+//                String mOccurances = cursor.getString(2);
+//                String mTimeFrame = cursor.getString(3);
+//
+//                ((TextView) getActivity().findViewById(R.id.goal_title_editbox))
+//                        .setText(mGoalName);
+//                ((TextView) getActivity().findViewById(R.id.goal_comments_editbox))
+//                        .setText(mComments);
+//                ((TextView) getActivity().findViewById(R.id.goal_occurrences_editbox))
+//                        .setText(String.valueOf(mOccurances));
+//                ((TextView) getActivity().findViewById(R.id.goal_timeframe_editbox))
+//                        .setText(String.valueOf(mTimeFrame));
+//            }
+//        }
 //    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(LOADER_ID, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
 
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         if(mDbID == -1 && getArguments() != null && getArguments().containsKey("dbid")) {

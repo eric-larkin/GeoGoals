@@ -16,9 +16,11 @@ import java.util.List;
 public class Goal implements Parcelable {
 
     private static int id = 0;
+    private static int geofenceId = 0;
 
     private List<LatLng> mLocations;
     private List<Integer> mRadii;
+    private List<Integer> mGeofenceIDs;
     private String mTitle;
     private int mOccurrences;
     private int mTimeFrame;
@@ -28,13 +30,15 @@ public class Goal implements Parcelable {
     private String mStartTime;
     private String mEndDate;
     private String mEndTime;
+    private int mCurrentOccurrences;
 
 
     public Goal() {
 
     }
 
-    public Goal(int id, String title, List<LatLng> locations, List<Integer> radii, int occurrences, int timeFrame, String comments, String startD, String endD, String startT, String endT) {
+    public Goal(int id, String title, List<LatLng> locations, List<Integer> radii, List<Integer> geofenceIDs,
+                int occurrences, int timeFrame, String comments, String startD, String endD, String startT, String endT, int currentOccurences) {
         mTitle = title;
         mLocations = locations;
         mRadii = radii;
@@ -46,8 +50,12 @@ public class Goal implements Parcelable {
         mEndDate = endD;
         mStartTime = startT;
         mEndTime = endT;
+        mGeofenceIDs = geofenceIDs;
+        mCurrentOccurrences = currentOccurences;
+
     }
-    public Goal(String title, List<LatLng> locations, List<Integer> radii, int occurrences, int timeFrame, String comments, String startD, String endD, String startT, String endT) {
+    public Goal(String title, List<LatLng> locations, List<Integer> radii, List<Integer> geofenceIDs,
+                int occurrences, int timeFrame, String comments, String startD, String endD, String startT, String endT) {
         mTitle = title;
         mLocations = locations;
         mRadii = radii;
@@ -59,6 +67,8 @@ public class Goal implements Parcelable {
         mEndDate = endD;
         mStartTime = startT;
         mEndTime = endT;
+        mGeofenceIDs = geofenceIDs;
+        mCurrentOccurrences = 0;
         id++;
     }
 
@@ -66,6 +76,7 @@ public class Goal implements Parcelable {
         mTitle = title;
         mLocations = new ArrayList<LatLng>();
         mRadii = new ArrayList<Integer>();
+        mGeofenceIDs = new ArrayList<Integer>();
         mOccurrences = 0;
         mTimeFrame = 0;
         mComments = "";
@@ -74,28 +85,32 @@ public class Goal implements Parcelable {
         mEndDate = "";
         mStartTime = "";
         mEndTime = "";
+        mCurrentOccurrences = 0;
         id++;
     }
 
     private Goal(Parcel in){
         mLocations = new ArrayList<LatLng>();
         mRadii = new ArrayList<Integer>();
+        mGeofenceIDs = new ArrayList<Integer>();
         mTitle = in.readString();
         mOccurrences = in.readInt();
         mTimeFrame = in.readInt();
         mComments = in.readString();
-        mId = id;
+        mId = in.readInt();
         mStartDate = in.readString();
         mEndDate = in.readString();
         mStartTime = in.readString();
         mEndTime = in.readString();
+        mCurrentOccurrences = in.readInt();
         //id++;
         in.readTypedList(mLocations, LatLng.CREATOR);
-        in.readList(mRadii, Integer.class.getClassLoader() );
+        in.readList(mRadii, Integer.class.getClassLoader());
+        in.readList(mGeofenceIDs, Integer.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<Goal> CREATOR
-            = new Parcelable.Creator<Goal>() {
+    public static final Creator<Goal> CREATOR
+            = new Creator<Goal>() {
         public Goal createFromParcel(Parcel in) {
             return new Goal(in);
         }
@@ -108,6 +123,7 @@ public class Goal implements Parcelable {
     public void addGeofence(LatLng coord, int radius){
         mLocations.add(coord);
         mRadii.add(radius);
+        mGeofenceIDs.add(geofenceId++);
     }
 
     public int getID() { return mId; }
@@ -167,6 +183,31 @@ public class Goal implements Parcelable {
 
     public String getEndTime() {return mEndTime;}
 
+
+    public void setIds(List<Integer> ids){
+        mGeofenceIDs = ids;
+    }
+
+    public int getCurrentOccurences(){
+        return mCurrentOccurrences;
+    }
+
+    public void incrementOccurences() {
+        mCurrentOccurrences++;
+    }
+
+    public void decrementOccurences() { //added 8-10-15
+        mCurrentOccurrences--;
+    }
+
+    public void setCurrentOccurrences(int occurrences) {
+        mCurrentOccurrences = occurrences;
+    }
+
+    public List<Integer> getIds() {
+        return mGeofenceIDs;
+    }
+
     //unsure what to put here
     public int describeContents(){
         return 0;
@@ -174,12 +215,31 @@ public class Goal implements Parcelable {
 
     public void writeToParcel(Parcel out, int flags){
         out.writeString(mTitle);
+        out.writeInt(mOccurrences);
+        out.writeInt(mTimeFrame);
+        out.writeString(mComments);
+        out.writeInt(mId);
+        out.writeString(mStartDate);
+        out.writeString(mEndDate);
+        out.writeString(mStartTime);
+        out.writeString(mEndTime);
+        out.writeInt(mCurrentOccurrences);
         out.writeTypedList(mLocations);
         out.writeList(mRadii);
+        out.writeList(mGeofenceIDs);
     }
 
     public int getOverallID() {
         return id;
     }
+
+    public static void setCurrentID(int previousId){
+        id = previousId;
+    }
+
+    public static void setGeofenceId(int previousId){
+        geofenceId = previousId;
+    }
+
 
 }

@@ -42,20 +42,15 @@ public class GoalDetail extends AppCompatActivity {
 
         if (id == R.id.action_editGoal) {
             Intent currentIntent = getIntent();
-//            GoalDetailFragment detail = new GoalDetailFragment();
-//            Goal passingGoal = (Goal)currentIntent.getSerializableExtra("selectedGoal");
-            int dbid = currentIntent.getIntExtra("dbid",0);
+
+            int dbid = currentIntent.getIntExtra("dbID",-1); //this is what was causing EditFragment  to use same goal
             Intent intent = new Intent(this, GoalEdit.class)
-//                    .putExtra("passingGoal", (Serializable)passingGoal);
                       .putExtra("dbid", dbid);
+
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void showTimePickerDialog(View v) {
-        DialogFragment newFragment = new TimePickerFragment();
-        newFragment.show(getSupportFragmentManager(), "timePicker");
-    }
 
 }
